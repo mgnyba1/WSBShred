@@ -24,7 +24,7 @@ async def wipe_disk(disk_name):
         proc1 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
         stdout2, stderr2 = await proc1.communicate()
 
-        f = open(f"Smarty/SMART_PRZED_{disk_name}.txt", "w")
+        f = open(f"Smarty/SMART_PRZED_CZYSZCZENIEM_{disk_name}.txt", "w")
         f.write(f"\r\n\r\nSMART DYSKU {disk_name}: {stdout2}")
 
 
@@ -40,13 +40,19 @@ async def wipe_disk(disk_name):
         print(stdout)
 
 
+    if CHECK_SMART:
+        proc1 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
+        stdout2, stderr2 = await proc1.communicate()
+
+        f = open(f"Smarty/SMART_PO_CZYSZCZENIU_{disk_name}.txt", "w")
+        f.write(f"\r\n\r\nSMART DYSKU {disk_name}: {stdout2}")
 
     if CHECK_SMART:
-        proc3 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
+        proc3 = await asyncio.create_subprocess_exec("./smartctl", "-t", "long","-C", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
         stdout3, stderr3 = await proc3.communicate()
 
-        f = open(f"Smarty/SMART_PO_{disk_name}.txt", "w")
-        f.write(f"\r\n\r\nSMART DYSKU {disk_name}: {stdout3}")
+        f = open(f"Smarty/SMART_PO_LONG_{disk_name}.txt", "w")
+        f.write(f"\r\n\r\nSMART LONG {disk_name}: {stdout3}")
 
 
 
