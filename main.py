@@ -1,24 +1,15 @@
-
-import os
-import sys
-from multiprocessing import Process
-from os import listdir
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from blkinfo import BlkDiskInfo
-from pySMART import Device
-import subprocess
-from pip._internal import exceptions
-from subprocess import check_output
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
 
-DD_MODE = False;
-CHECK_SMART = True;
+DD_MODE = False
+CHECK_SMART = True
 
 async def wipe_disk(disk_name):
 
-
-
-    print(f"Rozpoczynam czyszczenie dysku: {disk_name}");
+    print(f"Rozpoczynam czyszczenie dysku: {disk_name}")
 
     if CHECK_SMART:
         proc1 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
@@ -65,30 +56,48 @@ if __name__ == '__main__':
     tryb = input()
 
     if tryb == "BB":
-        DD_MODE = False;
+        DD_MODE = False
     else:
-        DD_MODE = True;
+        DD_MODE = True
 
     print("Wybierz sprawdzanie SMART: (0) WYLACZONY (1) WLACZONY")
 
     smart = input()
 
     if(smart == "0"):
-        CHECK_SMART = False;
+        CHECK_SMART = False
     else:
-        CHECK_SMART = True;
+        CHECK_SMART = True
 
-    print("Wpisz nazwe dysku systemowego np. sda. Ten dysk nie bedzie czyszczony.")
-    nazwa_dysku_systemowego = input()
 
+
+    while True:
+        print("Wpisz nazwe dysku systemowego np. sda. Ten dysk nie bedzie czyszczony:")
+        nazwa_dysku_systemowego = input()
+
+        print("Powtorz nazwe dysku systemowego:")
+        nazwa_dysku_systemowego2 = input()
+
+        if nazwa_dysku_systemowego != nazwa_dysku_systemowego2:
+            print("Nazwy dysku systemowego nie zgadzaja sie! Ponow probe.")
+
+        if nazwa_dysku_systemowego == nazwa_dysku_systemowego2:
+            break
+
+    tasks = []
 
     loop = asyncio.get_event_loop()
 
-    tasks = [
-        loop.create_task(wipe_disk("sdb")),
-        loop.create_task(wipe_disk("sdd")),
-    ]
+    for disk in all_my_disks:
+        if disk["name"] == nazwa_dysku_systemowego:
+            continue
 
-    loop.set_default_executor(ProcessPoolExecutor())
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
+        tasks.append(loop.create_task(wipe_disk(disk["name"])))
+
+    if len(tasks) == 0:
+        print("Wykryto: 0 innych dyskow. Przerywam dzialanie programu.")
+    else:
+
+        loop.set_default_executor(ProcessPoolExecutor())
+        loop.run_until_complete(asyncio.wait(tasks))
+        loop.close()
