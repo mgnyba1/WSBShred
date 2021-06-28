@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from blkinfo import BlkDiskInfo
+#from blkinfo import BlkDiskInfo
 import asyncio
+import subprocess
 from concurrent.futures import ProcessPoolExecutor
+#from psutil import *
 
 DD_MODE = False
 CHECK_SMART = True
+
+
+
+
 
 async def wipe_disk(disk_name):
 
@@ -48,8 +54,13 @@ async def wipe_disk(disk_name):
 
 
 if __name__ == '__main__':
-    myblkd = BlkDiskInfo()
-    all_my_disks = myblkd.get_disks()
+
+
+    all_my_disks = subprocess.check_output(['geom', 'disk', 'list', '|', 'grep', 'name'])
+
+    print(all_my_disks)
+
+
 
     print("Wybierz tryb: BADBLOCKS (Wpisz: BB), DD (Wpisz: DD) i zatwierdz:")
 
