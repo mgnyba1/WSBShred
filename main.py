@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import subprocess
+
 from blkinfo import BlkDiskInfo
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
@@ -21,15 +23,10 @@ async def wipe_disk(disk_name):
 
 
     if DD_MODE:
-        proc = await asyncio.create_subprocess_exec("./dd", f"if=/dev/zero", f"of=/dev/{disk_name}", f"bs=64k",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
-        print(stdout)
+        subprocess.call(['xterm', '-e', f'dd if=/dev/zero of=/dev/{disk_name} bs=64k'])
 
     else:
-        proc = await asyncio.create_subprocess_exec("./badblocks", "-sv", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
-        print(stdout)
-
+        subprocess.call(['xterm', '-e', f'badblocks -sv /dev/{disk_name}'])
 
     if CHECK_SMART:
         proc1 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
