@@ -23,10 +23,10 @@ async def wipe_disk(disk_name):
 
 
     if DD_MODE:
-        subprocess.call(['xterm', '-e', f'dd if=/dev/zero of=/dev/{disk_name} bs=64k'])
+        subprocess.call([f'gnome-terminal -x dd if=/dev/zero of=/dev/{disk_name} bs=64k'], shell=True)
 
     else:
-        subprocess.call(['xterm', '-e', f'badblocks -sv /dev/{disk_name}'])
+        subprocess.call([f'gnome-terminal -x badblocks -sv /dev/{disk_name}'], shell=True)
 
     if CHECK_SMART:
         proc1 = await asyncio.create_subprocess_exec("./smartctl", "-a", f"/dev/{disk_name}",stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
